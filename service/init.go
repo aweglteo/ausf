@@ -8,6 +8,9 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
+	"log"
+	"net/http"
+	_ "net/http/pprof"
 
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
@@ -153,6 +156,10 @@ func (ausf *AUSF) FilterCli(c *cli.Context) (args []string) {
 
 func (ausf *AUSF) Start() {
 	initLog.Infoln("Server started")
+
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6062", nil))
+	}()
 
 	router := logger_util.NewGinWithLogrus(logger.GinLog)
 	ueauthentication.AddService(router)
